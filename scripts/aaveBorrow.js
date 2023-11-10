@@ -1,9 +1,11 @@
 const { ethers } = require("hardhat")
 const { getNamedAccounts } = require("hardhat")
 
-const { getWeth } = require("../scripts/getWeth")
-const { getLendingPool } = require("../scripts/getLendingPool")
-const { approveWeths } = require("./approveWeths")
+const { getWeth } = require("./helper-modules/getWeth")
+const { getLendingPool } = require("./helper-modules/getLendingPool")
+const { approveWeths } = require("./helper-modules/approveWeths")
+const { getBorrowUserData } = require("./helper-modules/getUserData")
+const { getDaiPrice } = require("./helper-modules/getDaiPrice")
 
 async function main() {
     const { deployer } = await getNamedAccounts()
@@ -24,6 +26,24 @@ async function main() {
     const tx = await lendingPool.deposit(wethTokenAddress, AMOUNT, deployer, 0)
     await tx.wait(1)
     console.log(`main: ${AMOUNT.toString()} was WETH depositated into the lending pool`)
+
+    // Getting your borrowing stats
+
+    //Get user data: total lended, total available to borrow
+    let { totalDebtETH, availableBorrowsETH } = await getBorrowUserData(lendingPool, deployer)
+
+    //Get DAI price
+    const daiPrice = await getDaiPrice()
+
+    // Calculate how many DAI I can lend based on the total available to borrow ETH using the DAI price
+    const amountDaiToBorrow = availableBorrowsETH.toString() * 0.95 * (1 / daiPrice.toNumber())
+    console.log(`You can borrow ${amountDaiToBorrow.toString()} DAI`)
+    const amountDaiToBorrowWei = ethers.utils.parseEther(amountDaiToBorrow.toString())
+    console.log(`You can borrow ${amountDaiToBorrowWei} WEI of DAI`)
+    // await borrowDai(networkConfig[network.config.chainId].daiToken, lendingPool, amountDaiToBorrowWei, deployer)
+    // await getBorrowUserData(lendingPool, deployer)
+    // await repay(amountDaiToBorrowWei, networkConfig[network.config.chainId].daiToken, lendingPool, deployer)
+    // await getBorrowUserData(lendingPool, deployer)
 }
 
 main()
