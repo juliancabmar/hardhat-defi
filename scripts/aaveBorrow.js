@@ -4,13 +4,17 @@ const { getNamedAccounts } = require("hardhat")
 const { getWeth } = require("./helper-modules/getWeth")
 const { getPool } = require("./helper-modules/getPool")
 const { approvePool } = require("./helper-modules/approvePool")
-const { getBorrowUserData } = require("./helper-modules/getUserData")
+const { getUserData } = require("./helper-modules/getUserData")
 const { getDaiPrice } = require("./helper-modules/getDaiPrice")
+
+const AAVE_BASE_CURRENCY_DECIMALS = 8
 
 async function main() {
     const { deployer } = await getNamedAccounts()
     const wethTokenAddress = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
     const AMOUNT = ethers.utils.parseEther("0.02")
+
+    const decimals = AAVE_BASE_CURRENCY_DECIMALS
 
     // Getting WETH from ETH
     await getWeth(wethTokenAddress, deployer, AMOUNT)
@@ -28,11 +32,17 @@ async function main() {
     await tx.wait(1)
     console.log(`main: ${ethers.utils.formatEther(AMOUNT)} WETHs was depositated into the Pool`)
 
-    //Get user data: total lended, total available to borrow
-    // let { totalDebtETH, availableBorrowsETH } = await getBorrowUserData(lendingPool, deployer)
+    // Get user data: total lended, total available to borrow
+    let { totalCollateralBase, totalDebtBase, availableBorrowsBase } = await getUserData(pool, deployer)
+    console.log(`You have ${totalCollateralBase * 10 ** -decimals} DAI deposited.`)
+    // tienes 20 ETH depositados.
+    console.log(`You have ${totalDebtBase * 10 ** -decimals} DAI borrowed.`)
+    // Tienes 0 ETH prestados.
+    console.log(`You can borrow ${availableBorrowsBase * 10 ** -decimals} DAI.`)
+    // Puedes pedir prestado ETH por valor de 16.
 
-    // //Get DAI price
-    // const daiPrice = await getDaiPrice()
+    //Get DAI price
+    const daiPrice = await getDaiPrice()
 
     // // Calculate how many DAI I can lend based on the total available to borrow ETH using the DAI price
     // const amountDaiToBorrow = availableBorrowsETH.toString() * 0.95 * (1 / daiPrice.toNumber())

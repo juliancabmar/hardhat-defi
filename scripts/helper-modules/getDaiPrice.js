@@ -2,8 +2,6 @@ const { ethers } = require("hardhat")
 
 const { networkConfig } = require("../../helper-hardhat-config")
 
-const decimals = 8
-
 async function getDaiPrice() {
     const daiEthPriceFeed = await ethers.getContractAt(
         "AggregatorV3Interface",
@@ -14,4 +12,4 @@ async function getDaiPrice() {
     return price
 }
 
-module.exports = { getDaiPrice, decimals }
+module.exports = { getDaiPrice }
