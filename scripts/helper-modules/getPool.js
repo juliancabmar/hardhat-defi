@@ -1,9 +1,11 @@
 const { ethers } = require("hardhat")
 
+const { networkConfig } = require("../../helper-hardhat-config")
+
 async function getPool(account) {
     const poolAddressProvider = await ethers.getContractAt(
         "IPoolAddressesProvider",
-        "0x2f39d218133AFaB8F2B819B1066c7E434Ad94E9e",
+        networkConfig[network.config.chainId].poolAddressesProvider,
         account
     )
     const poolAddress = await poolAddressProvider.getPool()
