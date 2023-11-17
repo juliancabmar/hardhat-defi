@@ -1,5 +1,28 @@
-#Instructions for use:
+# Defi with hardhat and AaveV3
 
+## Instructions for use
+
+### Clone the repo:
+```
+$ git clone https://github.com/juliancabmar/hardhat-defi
+```
+### Install depencences:
+```
+$ yarn
+```
+or
+```
+$ npm i
+```
+### Run:
+```
+$ yarn hardhat run scripts/aaveBorrow.js 
+```
+or
+```
+$ npx hardhat run scripts/aaveBorrow.js 
+```
+### Program steps:
 
 1. Getting WETH from ETH
 2. Get the Pool address
